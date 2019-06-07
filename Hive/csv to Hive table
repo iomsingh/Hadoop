@@ -1,0 +1,65 @@
+-- 1. Create an external table.
+-- The following command creates an external table- aggregate_top_level_temp
+CREATE EXTERNAL TABLE wcf_10361.maii(
+assetid int,
+computername varchar(512),
+serialnumber varchar(128),
+enterpriseid varchar(128)
+)
+COMMENT 'maii'
+ROW FORMAT DELIMITED
+FIELDS TERMINATED BY '|'
+STORED AS TEXTFILE
+location '/data/insight/mysecure/maii';
+
+--2. load data into external table "aggregate_top_level_temp" 
+
+load data local inpath 'mai.txt' OVERWRITE into table maii;
+
+load data local inpath '/home/ngap.sandbox.user/mai.txt' OVERWRITE into table wcf_10361.maii;
+
+==========================main table ==========
+
+CREATE TABLE wcf_10361.maii1(
+assetid int,
+computername varchar(512),
+serialnumber varchar(128),
+enterpriseid varchar(128)
+)
+COMMENT 'test'
+ROW FORMAT DELIMITED
+FIELDS TERMINATED BY '|'
+STORED AS ORC
+location '/data/insight/mysecure/maii1';
+
+
+insert into wcf_10361.maii1 select * from wcf_10361.maii;
+
+
+insert into 10361_msw.aggregate_top_level select * from 10361_msw.ag_top_level_tst;
+
+
+ http://www.hadoopadmin.co.in/hive/insert-date-into-hive-tables-shows-null-during-select/
+ 
+ 
+insert into 10361_msw.aggregate_top_level select from_unixtime((unix_timestamp(computation_date, 'dd-MM-yyyy HH:mm'))) ,au_gdn,portfolio,country,business_group,machine_count,machine_nc_count,patching_nc_count,antivirus_nc_count,hd_encryption_nc_count,unauthorized_sw_nc_count,firewall_nc_count,dlp_nc_count,avecto_nc_count,secure_web_nc_count,adobe_nc_count,internet_explorer_nc_count,java_nc_count,office365_nc_count,os_build_version_nc_count,edm_nc_count,eeva_nc_count,phishme_nc_count,tanium_nc_count from 10361_msw.ag_top_level_tst;
+
+
+
+
+
+load data local inpath 'aggt_top_level.txt' OVERWRITE into table ag_top_level_tst;
+
+
+
+hive> create table tmp(a string, b string) row format delimited fields terminated by ',';
+hive> load data local inpath 'a.txt' overwrite into table tmp;
+hive> create table mytime(a string, b timestamp);
+hive> insert into table mytime select a, from_unixtime(unix_timestamp(b, 'dd-MM-yyyy HH:mm')) from tmp;
+hive> select * from mytime;
+
+
+It's simple usually to change/modify the exesting table use this syntax in Hive.
+
+ALTER TABLE table_name CHANGE old_col_name new_col_name new_data_type
+
